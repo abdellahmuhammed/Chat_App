@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1056309293294",
+    "project_id": "my-chat-ce780",
+    "storage_bucket": "my-chat-ce780.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1056309293294:android:50dc33943c9c472a7943ff",
+        "android_client_info": {
+          "package_name": "com.example.chat_app3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeysuzS5nAKymcPXwEfGBcQNe3Q6u41hs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
