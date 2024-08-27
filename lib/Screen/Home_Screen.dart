@@ -4,28 +4,30 @@ import 'package:chat_app3/shared/constant.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final CollectionReference messages =
       FirebaseFirestore.instance.collection(kMessageCollection);
+
   final TextEditingController controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<QuerySnapshot>(
-      future: messages.get(),
+    return StreamBuilder<QuerySnapshot>(
+      stream: messages.orderBy(kCreatedAt ,descending:false ).snapshots(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container(
-              color: kButtonColor,
-              child: Center(
-                child: CircularProgressIndicator(),
-              ));
-        } else if (snapshot.hasData) {
+      if (snapshot.hasData) {
           List<MessageModel> messageList = [];
           for (int i = 0; i < snapshot.data!.docs.length; i++) {
-            messageList.add(MessageModel.fromJson(snapshot.data!.docs[i]),);
+            messageList.add(
+              MessageModel.fromJson(snapshot.data!.docs[i]),
+            );
           }
           return Scaffold(
             appBar: CustomAppBar(context,
@@ -68,8 +70,10 @@ class HomeScreen extends StatelessWidget {
                     ),
                     onSubmitted: (vlue) {
                       if (vlue.isNotEmpty) {
-
-                        messages.add({'messages': vlue});
+                        messages.add({
+                          kMessage: vlue,
+                          kCreatedAt : DateTime.now()
+                          });
                         controller.clear();
                       }
                     },
