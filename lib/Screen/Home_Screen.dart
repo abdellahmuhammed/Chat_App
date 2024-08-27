@@ -1,26 +1,48 @@
-import 'package:chat_app3/Screen/Registration%20Screens/Login_Screen.dart';
+import 'package:chat_app3/shared/components.dart';
+import 'package:chat_app3/shared/constant.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
+  HomeScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(onPressed: (){
-            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> LoginScreen()),
-            );
-          }, icon:Icon(Icons.add))
-        ],
-      ),
+    return Scaffold(
+      appBar: CustomAppBar(context, tittle: 'Samona Chat', centerTittle: true),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Center(
-            child: Text('Home Screen ' , style:  Theme.of(context).textTheme.titleLarge,),
-          )
+          Expanded(
+            child: ListView.builder(
+              itemBuilder: (context, index) => CustomChatContainer(
+                bottomRight: 5,
+                color: kPrimaryColor,
+                text: 'new gona lsjdfddkdg',
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: TextField(
+              decoration: InputDecoration(
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: BorderSide(color: kPrimaryColor),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: BorderSide(color: kPrimaryColor),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: BorderSide(color: kPrimaryColor),
+                  ),
+                  suffixIcon: Icon(
+                    Icons.send,
+                    color: kPrimaryColor,
+                  ),
+                  label: Text('Send Message'),
+                  labelStyle: TextStyle(color: kPrimaryColor)),
+            ),
+          ),
         ],
       ),
     );

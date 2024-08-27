@@ -1,29 +1,29 @@
+import 'package:chat_app3/shared/constant.dart';
 import 'package:flutter/material.dart';
 
 class CustomTextFormField extends StatelessWidget {
   final GlobalKey<FormState> formKey;
-  final String label;
+  final String? label;
   final TextEditingController? controller;
-  final IconData prefixIcon;
+  final IconData? prefixIcon;
   final IconData? suffixIcon;
   final bool? passwordSecure;
   final String stringValidate;
   final TextInputType? keyboardType;
   final Function(String)? onChanged;
 
-  CustomTextFormField(
-      {super.key,
-      required this.formKey,
-      required this.label,
-      required this.prefixIcon,
-      this.stringValidate = 'some info is missed',
-      this.suffixIcon,
-      this.controller,
-      this.passwordSecure = false,
-      this.keyboardType,
-      this.onChanged,
-      });
-
+  CustomTextFormField({
+    super.key,
+    required this.formKey,
+     this.label,
+     this.prefixIcon,
+    this.stringValidate = 'some info is missed',
+    this.suffixIcon,
+    this.controller,
+    this.passwordSecure = false,
+    this.keyboardType,
+    this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,10 @@ class CustomTextFormField extends StatelessWidget {
       controller: controller,
       obscureText: passwordSecure!,
       decoration: InputDecoration(
-        label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15)
+        ),
+        label: Text(label?? '', maxLines: 1, overflow: TextOverflow.ellipsis),
         prefixIcon: Icon(prefixIcon),
         suffixIcon: IconButton(
           onPressed: () {},
@@ -54,9 +57,6 @@ class CustomTextFormField extends StatelessWidget {
     );
   }
 }
-
-
-
 
 // Custom Material Button To Send Data from Login screen to Home screen or from Register Screen to home screen
 // class CustomMaterialButton extends StatelessWidget {
@@ -154,11 +154,13 @@ class CustomGestureDetector extends StatelessWidget {
 }
 
 AppBar CustomAppBar(context,
-        {String text = 'Chat App', bool automaticallyImplyLeading = false}) =>
+        {String tittle = 'Chat App', bool automaticallyImplyLeading = true , bool centerTittle = false}) =>
     AppBar(
+      centerTitle: centerTittle,
+      backgroundColor: kPrimaryColor,
       automaticallyImplyLeading: automaticallyImplyLeading,
       title: Text(
-        text,
+        tittle,
         style: Theme.of(context).textTheme.titleLarge,
       ),
     );
@@ -175,4 +177,45 @@ void snackBarErrorMassage(context, {required String message}) {
 void navigateAndRemove(BuildContext context, Widget widget) {
   Navigator.pushAndRemoveUntil(context,
       MaterialPageRoute(builder: (context) => widget), (route) => false);
+}
+
+class CustomChatContainer extends StatelessWidget {
+  CustomChatContainer(
+      {super.key,
+      this.bottomRight,
+      this.bottomLeft,
+      required this.color,
+      required this.text});
+  final double? bottomRight;
+  final double? bottomLeft;
+  final Color color;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Container(
+        margin: EdgeInsets.all(5),
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 15,
+          bottom: 15
+        ),
+        child: Text(
+          '$text',
+          textAlign: TextAlign.start,
+        ),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(12),
+              topRight: Radius.circular(15),
+              bottomRight: Radius.circular(bottomRight ?? 0),
+              bottomLeft: Radius.circular(bottomLeft ?? 0)),
+        ),
+      ),
+    );
+  }
 }

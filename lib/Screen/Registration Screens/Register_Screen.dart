@@ -1,6 +1,7 @@
 import 'package:chat_app3/Screen/Home_Screen.dart';
 import 'package:chat_app3/Screen/Registration%20Screens/Login_Screen.dart';
 import 'package:chat_app3/shared/components.dart';
+import 'package:chat_app3/shared/constant.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
@@ -25,6 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return ModalProgressHUD(
       inAsyncCall: isLoading,
       child: Scaffold(
+        backgroundColor: kPrimaryColor,
         appBar: CustomAppBar(context),
         body: bodyRegisterScreen(context),
       ),
@@ -113,7 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   RegisterMaterialButton(BuildContext context) {
     return MaterialButton(
       minWidth: double.infinity,
-      color: Colors.blueAccent.shade200,
+              color:kButtonColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),

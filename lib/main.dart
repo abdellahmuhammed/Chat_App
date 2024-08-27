@@ -1,12 +1,11 @@
 import 'package:chat_app3/Screen/Registration%20Screens/Login_Screen.dart';
-import 'package:chat_app3/shared/themes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-import 'firebase_options.dart';
+import 'firebase_options.dart'; 
 
-void main()async {
-   WidgetsFlutterBinding.ensureInitialized();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -18,12 +17,9 @@ class ChatApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
 
-      theme: lightTheme(context),
-      darkTheme: darkTheme(context),
-      themeMode:ThemeMode.light,
       home: LoginScreen(),
     );
   }
