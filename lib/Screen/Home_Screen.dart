@@ -1,3 +1,4 @@
+import 'package:chat_app3/model/MessageModel.dart';
 import 'package:chat_app3/shared/components.dart';
 import 'package:chat_app3/shared/constant.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,27 +16,29 @@ class HomeScreen extends StatelessWidget {
     return FutureBuilder<QuerySnapshot>(
       future: messages.get(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting){
-         
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return Container(
               color: kButtonColor,
               child: Center(
                 child: CircularProgressIndicator(),
               ));
         } else if (snapshot.hasData) {
-           print(snapshot.data!.docs[0]['messages']);
+          List<MessageModel> messageList = [];
+          for (int i = 0; i < snapshot.data!.docs.length; i++) {
+            messageList.add(MessageModel.fromJson(snapshot.data!.docs[i]),);
+          }
           return Scaffold(
-            
             appBar: CustomAppBar(context,
                 tittle: 'Samona Chat', centerTittle: true),
             body: Column(
               children: [
                 Expanded(
                   child: ListView.builder(
+                    itemCount: messageList.length,
                     itemBuilder: (context, index) => CustomChatContainer(
                       bottomRight: 5,
                       color: kPrimaryColor,
-                      text: 'new gona lsjdfddkdg',
+                      message: messageList[index],
                     ),
                   ),
                 ),
@@ -63,9 +66,10 @@ class HomeScreen extends StatelessWidget {
                       label: Text('Send Message'),
                       labelStyle: TextStyle(color: kPrimaryColor),
                     ),
-                    onSubmitted: (message) {
-                      if (message.isNotEmpty) {
-                        messages.add({'messages': message});
+                    onSubmitted: (vlue) {
+                      if (vlue.isNotEmpty) {
+
+                        messages.add({'messages': vlue});
                         controller.clear();
                       }
                     },

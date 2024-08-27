@@ -1,3 +1,4 @@
+import 'package:chat_app3/model/MessageModel.dart';
 import 'package:chat_app3/shared/constant.dart';
 import 'package:flutter/material.dart';
 
@@ -15,8 +16,8 @@ class CustomTextFormField extends StatelessWidget {
   CustomTextFormField({
     super.key,
     required this.formKey,
-     this.label,
-     this.prefixIcon,
+    this.label,
+    this.prefixIcon,
     this.stringValidate = 'some info is missed',
     this.suffixIcon,
     this.controller,
@@ -33,10 +34,8 @@ class CustomTextFormField extends StatelessWidget {
       controller: controller,
       obscureText: passwordSecure!,
       decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15)
-        ),
-        label: Text(label?? '', maxLines: 1, overflow: TextOverflow.ellipsis),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+        label: Text(label ?? '', maxLines: 1, overflow: TextOverflow.ellipsis),
         prefixIcon: Icon(prefixIcon),
         suffixIcon: IconButton(
           onPressed: () {},
@@ -154,7 +153,9 @@ class CustomGestureDetector extends StatelessWidget {
 }
 
 AppBar CustomAppBar(context,
-        {String tittle = 'Chat App', bool automaticallyImplyLeading = true , bool centerTittle = false}) =>
+        {String tittle = 'Chat App',
+        bool automaticallyImplyLeading = true,
+        bool centerTittle = false}) =>
     AppBar(
       centerTitle: centerTittle,
       backgroundColor: kPrimaryColor,
@@ -185,11 +186,13 @@ class CustomChatContainer extends StatelessWidget {
       this.bottomRight,
       this.bottomLeft,
       required this.color,
-      required this.text});
+    required  this.message});
+
+
   final double? bottomRight;
   final double? bottomLeft;
   final Color color;
-  final String text;
+  final MessageModel? message;
 
   @override
   Widget build(BuildContext context) {
@@ -197,14 +200,9 @@ class CustomChatContainer extends StatelessWidget {
       alignment: Alignment.topLeft,
       child: Container(
         margin: EdgeInsets.all(5),
-        padding: EdgeInsets.only(
-          left: 16,
-          right: 16,
-          top: 15,
-          bottom: 15
-        ),
+        padding: EdgeInsets.only(left: 16, right: 16, top: 15, bottom: 15),
         child: Text(
-          '$text',
+          message!.message,
           textAlign: TextAlign.start,
         ),
         decoration: BoxDecoration(
