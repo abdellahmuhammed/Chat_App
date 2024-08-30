@@ -15,14 +15,17 @@ class _HomeScreenState extends State<HomeScreen> {
   final CollectionReference messages =
       FirebaseFirestore.instance.collection(kMessageCollection);
 
-  final TextEditingController controller = TextEditingController();
+  final TextEditingController txetFormController = TextEditingController();
+  final lsitController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: messages.orderBy(kCreatedAt ,descending:false ).snapshots(),
+    return StreamBuilder(
+      stream: messages.orderBy(kCreatedAt, descending: false).snapshots(),
       builder: (context, snapshot) {
-      if (snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasData) {
           List<MessageModel> messageList = [];
           for (int i = 0; i < snapshot.data!.docs.length; i++) {
             messageList.add(
@@ -36,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Expanded(
                   child: ListView.builder(
+                    controller: lsitController,
                     itemCount: messageList.length,
                     itemBuilder: (context, index) => CustomChatContainer(
                       bottomRight: 5,
@@ -47,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: TextField(
-                    controller: controller,
+                    controller: txetFormController,
                     decoration: InputDecoration(
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5),
@@ -70,11 +74,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     onSubmitted: (vlue) {
                       if (vlue.isNotEmpty) {
-                        messages.add({
-                          kMessage: vlue,
-                          kCreatedAt : DateTime.now()
-                          });
-                        controller.clear();
+                        messages
+                            .add({kMessage: vlue, kCreatedAt: DateTime.now()});
+                        txetFormController.clear();
+                        lsitController.animateTo(lsitController.position.maxScrollExtent,
+                            duration: Duration(seconds: 1),
+                             curve: Curves.easeIn,
+                            );
                       }
                     },
                   ),
