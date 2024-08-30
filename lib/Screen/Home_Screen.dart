@@ -5,8 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key});
-
+  HomeScreen({super.key, required this.userEmail});
+  final String userEmail;
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: messages.orderBy(kCreatedAt, descending: false).snapshots(),
+      stream: messages.orderBy(kCreatedAt, descending: true).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -39,14 +39,24 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Expanded(
                   child: ListView.builder(
-                    controller: lsitController,
-                    itemCount: messageList.length,
-                    itemBuilder: (context, index) => CustomChatContainer(
-                      bottomRight: 5,
-                      color: kPrimaryColor,
-                      message: messageList[index],
-                    ),
-                  ),
+                      reverse: true,
+                      controller: lsitController,
+                      itemCount: messageList.length,
+                      itemBuilder: (context, index) {
+                        return messageList[index].id == widget.userEmail
+                            ? CustomChatContainer(
+                              alignment: Alignment.centerLeft,
+                                bottomRight: 5,
+                                color: kPrimaryColor,
+                                message: messageList[index],
+                              )
+                            : CustomChatContainer(
+                               alignment: Alignment.centerRight,
+                                color: Colors.blueGrey[50]!,
+                                message: messageList[index],
+                                bottomLeft: 15,
+                              );
+                      }),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(12.0),
@@ -74,13 +84,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     onSubmitted: (vlue) {
                       if (vlue.isNotEmpty) {
-                        messages
-                            .add({kMessage: vlue, kCreatedAt: DateTime.now()});
+                        messages.add({
+                          kMessage: vlue,
+                          kCreatedAt: DateTime.now(),
+                          'id': widget.userEmail
+                        });
                         txetFormController.clear();
-                        lsitController.animateTo(lsitController.position.maxScrollExtent,
-                            duration: Duration(seconds: 1),
-                             curve: Curves.easeIn,
-                            );
+                        lsitController.animateTo(
+                          0,
+                          duration: Duration(seconds: 1),
+                          curve: Curves.easeIn,
+                        );
                       }
                     },
                   ),

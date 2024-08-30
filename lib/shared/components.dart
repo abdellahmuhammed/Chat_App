@@ -186,8 +186,48 @@ class CustomChatContainer extends StatelessWidget {
       this.bottomRight,
       this.bottomLeft,
       required this.color,
-    required  this.message});
+      required this.message,
+       this.userEmail,
+        required this.alignment});
 
+  final double? bottomRight;
+  final double? bottomLeft;
+  final Color color;
+  final MessageModel? message;
+  final String? userEmail;
+  final Alignment alignment;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment:alignment ,
+      child: Container(
+        margin: EdgeInsets.all(5),
+        padding: EdgeInsets.only(left: 16, right: 16, top: 15, bottom: 15),
+        child: Text(
+          message!.message,
+          textAlign: TextAlign.start,
+        ),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(12),
+              topRight: Radius.circular(15),
+              bottomRight: Radius.circular(bottomRight ?? 0),
+              bottomLeft: Radius.circular(bottomLeft ?? 0)),
+        ),
+      ),
+    );
+  }
+}
+
+class CustomChatContainerForFrind extends StatelessWidget {
+  CustomChatContainerForFrind(
+      {super.key,
+      this.bottomRight,
+      this.bottomLeft,
+      required this.color,
+      required this.message});
 
   final double? bottomRight;
   final double? bottomLeft;

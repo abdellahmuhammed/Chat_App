@@ -141,7 +141,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             await buildUserRegister();
             snackBarErrorMassage(context,
                 message: 'Register Successfully');
-            navigateAndRemove(context, HomeScreen());
+            navigateAndRemove(context, HomeScreen(userEmail: userEmail!,));
             isLoading = false;
             setState(() {});
           } on FirebaseAuthException catch (e) {

@@ -8,7 +8,6 @@ import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
-
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -77,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 label: 'Enter your password',
                 formKey: formKey,
                 prefixIcon: Icons.lock,
-                passwordSecure: false,
+                passwordSecure: true,
                 suffixIcon: Icons.visibility,
                 keyboardType: TextInputType.text,
                 stringValidate: ' Password was Missed',
@@ -86,7 +85,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 20,
               ),
               LoginMaterialButton(context),
-              //CustomLoginMaterialButton(formKey: formKey, userEmail: userEmail , userPassword: userPassword,),
               const SizedBox(
                 height: 10,
               ),
@@ -123,15 +121,13 @@ class _LoginScreenState extends State<LoginScreen> {
             setState(() {});
             await buildUserLogin();
             snackBarErrorMassage(context, message: 'login Successfully');
-            navigateAndRemove(context, HomeScreen());
+            navigateAndRemove(context, HomeScreen(userEmail: userEmail!,));
             isLoading = false;
             setState(() {});
           } on FirebaseAuthException catch (e) {
             buildErrorLogin(e, context);
             isLoading = false;
-            setState(() {
-              
-            });
+            setState(() {});
           } catch (e) {
             snackBarErrorMassage(context,
                 message: 'an error happened try again');
@@ -154,12 +150,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void buildErrorLogin(FirebaseAuthException e, BuildContext context) {
     if (e.code == 'user-not-found') {
-      print('error is in email${e.toString()}');
       snackBarErrorMassage(context, message: 'No user found for that email.');
     } else if (e.code == 'wrong-password') {
       print('error is in password${e.toString()}');
       snackBarErrorMassage(context,
           message: 'Wrong password provided for that user');
+    }else{
+         snackBarErrorMassage(context,
+          message: 'email or password was Wrong');
     }
   }
 }
