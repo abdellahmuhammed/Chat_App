@@ -8,6 +8,7 @@ import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -24,13 +25,12 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Scaffold(
         backgroundColor: kPrimaryColor,
         appBar: CustomAppBar(context),
-        body: bodyLoginScreen(context),
+        body: _bodyLoginScreen(context),
       ),
     );
   }
 
-// build Body of
-  Form bodyLoginScreen(BuildContext context) {
+  Form _bodyLoginScreen(BuildContext context) {
     return Form(
       key: formKey,
       child: SingleChildScrollView(
@@ -44,17 +44,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 'assets/images/chat_Image.png',
                 height: MediaQuery.of(context).size.height * .40,
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               Text(
                 'Login '.toUpperCase(),
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              // Email Text Form Field
+              const SizedBox(height: 20),
               CustomTextFormField(
                 onChanged: (email) {
                   userEmail = email;
@@ -65,10 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 keyboardType: TextInputType.emailAddress,
                 stringValidate: 'Email was Missed',
               ),
-              const SizedBox(
-                height: 30,
-              ),
-              //password Text Form Field
+              const SizedBox(height: 30),
               CustomTextFormField(
                 onChanged: (password) {
                   userPassword = password;
@@ -77,21 +69,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 formKey: formKey,
                 prefixIcon: Icons.lock,
                 passwordSecure: true,
-                suffixIcon: Icons.visibility,
                 keyboardType: TextInputType.text,
-                stringValidate: ' Password was Missed',
+                stringValidate: 'Password was Missed',
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              LoginMaterialButton(context),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 20),
+              _loginMaterialButton(context),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   Text(
-                    'Do not have account ?',
+                    'Do not have an account?',
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   CustomGestureDetector(
@@ -107,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  LoginMaterialButton(BuildContext context) {
+  Widget _loginMaterialButton(BuildContext context) {
     return MaterialButton(
       minWidth: double.infinity,
       color: kButtonColor,
@@ -119,20 +106,19 @@ class _LoginScreenState extends State<LoginScreen> {
           try {
             isLoading = true;
             setState(() {});
-            await buildUserLogin();
-            snackBarErrorMassage(context, message: 'login Successfully');
-            navigateAndRemove(context, HomeScreen(userEmail: userEmail!,));
+            await _buildUserLogin();
+            snackBarErrorMassage(context, message: 'Login Successfully');
+            navigateAndRemove(context, HomeScreen(userEmail: userEmail!));
             isLoading = false;
             setState(() {});
           } on FirebaseAuthException catch (e) {
-            buildErrorLogin(e, context);
+            _buildErrorLogin(e, context);
             isLoading = false;
             setState(() {});
           } catch (e) {
-            snackBarErrorMassage(context,
-                message: 'an error happened try again');
-
-            print('error happened ${e.toString()}');
+            snackBarErrorMassage(context, message: 'An error happened. Please try again.');
+            isLoading = false;
+            setState(() {});
           }
         }
       },
@@ -143,21 +129,22 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> buildUserLogin() async {
-    await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: userEmail!, password: userPassword!);
+  Future<void> _buildUserLogin() async {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: userEmail!,
+      password: userPassword!,
+    );
   }
 
-  void buildErrorLogin(FirebaseAuthException e, BuildContext context) {
+  void _buildErrorLogin(FirebaseAuthException e, BuildContext context) {
+    String errorMessage;
     if (e.code == 'user-not-found') {
-      snackBarErrorMassage(context, message: 'No user found for that email.');
+      errorMessage = 'No user found for that email.';
     } else if (e.code == 'wrong-password') {
-      print('error is in password${e.toString()}');
-      snackBarErrorMassage(context,
-          message: 'Wrong password provided for that user');
-    }else{
-         snackBarErrorMassage(context,
-          message: 'email or password was Wrong');
+      errorMessage = 'Wrong password provided for that user.';
+    } else {
+      errorMessage = 'Email or password is incorrect.';
     }
+    snackBarErrorMassage(context, message: errorMessage);
   }
 }
