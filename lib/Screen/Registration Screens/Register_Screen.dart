@@ -1,185 +1,144 @@
-import 'package:chat_app3/Screen/Home_Screen.dart';
 import 'package:chat_app3/Screen/Registration%20Screens/Login_Screen.dart';
+import 'package:chat_app3/cubits/RegisterCubit/register_cubit.dart';
 import 'package:chat_app3/shared/components.dart';
 import 'package:chat_app3/shared/constant.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+import '../Home_Screen.dart';
 
-  @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
-}
-
-class _RegisterScreenState extends State<RegisterScreen> {
+class RegisterScreen extends StatelessWidget {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String? userEmail, userPassword;
-  bool isLoading = false;
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
 
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    return ModalProgressHUD(
-      inAsyncCall: isLoading,
-      child: Scaffold(
-        backgroundColor: kPrimaryColor,
-        appBar: CustomAppBar(context),
-        body: bodyRegisterScreen(context),
-      ),
-    );
-  }
-// build Body of
-  Form bodyRegisterScreen(BuildContext context) {
-    return Form(
-      key: formKey,
-      child: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Image.asset(
-                'assets/images/chat_Image.png',
-                height: MediaQuery.of(context).size.height * .40,
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Text(
-                'Register '.toUpperCase(),
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              // Email Text Form Field
-              CustomTextFormField(
-                onChanged: (email) {
-                  userEmail = email;
-                },
-                label: 'Enter your Email',
-                formKey: formKey,
-                prefixIcon: Icons.email,
-                keyboardType: TextInputType.emailAddress,
-                stringValidate: 'Email was Missed',
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              //password Text Form Field
-              CustomTextFormField(
-                controller: passwordController,
-                onChanged: (password) {
-                  userPassword = password;
-                },
-                label: 'Enter your password',
-                formKey: formKey,
-                prefixIcon: Icons.lock,
-                passwordSecure: false,
-                suffixIcon: Icons.visibility,
-                keyboardType: TextInputType.text,
-                stringValidate: ' Password was Missed ',
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              RegisterMaterialButton(context),
-              //CustomRegisterMaterialButton(formKey: formKey, userEmail: userEmail , userPassword: userPassword,),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                children: [
-                  Text(
-                    'already have an account?',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  CustomGestureDetector(
-                    text: '  Login',
-                    widget: LoginScreen(),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  RegisterMaterialButton(BuildContext context) {
-    return MaterialButton(
-      minWidth: double.infinity,
-              color:kButtonColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      onPressed: () async {
-        if (formKey.currentState!.validate()) {
-          try {
-            // التحقق من أن البريد الإلكتروني يحتوي على @ وعلى نطاق صحيح
-            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(userEmail!)) {
-              snackBarErrorMassage(context, message: 'Invalid email format');
-            }
-            // التحقق من طول البريد الإلكتروني
-            else if (userEmail!.length < 5) {
-              snackBarErrorMassage(context, message: 'Email is too short');
-            }
-            // التحقق من أن كلمة السر تحتوي على أحرف وأرقام
-            if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$').hasMatch(userPassword!)) {
-              snackBarErrorMassage(context, message: 'Password must contain letters and numbers');
-              return;
-            }
-
-            isLoading = true;
-            setState(() {});
-            await buildUserRegister();
-            snackBarErrorMassage(context,
-                message: 'Register Successfully');
-            navigateAndRemove(context, HomeScreen(userEmail: userEmail!,));
-            isLoading = false;
-            setState(() {});
-          } on FirebaseAuthException catch (e) {
-            buildErrorRegister(e, context);
-            isLoading = false;
-            setState(() {});
-          } catch (e) {
-            snackBarErrorMassage(context,
-                message: 'an error happened try again');
-            print('error happened ${e.toString()}');
-            isLoading = false;
-            setState(() {});
-          }
+    return BlocConsumer<RegisterCubit, RegisterState>(
+      listener: (context, state) {
+        if (state is RegisterIsLoadingState) {
+          isLoading = true;
+        } else if (state is RegisterSuccessState) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(userEmail: userEmail),
+            ),
+          );
+          //navigateAndRemove(context, HomeScreen(userEmail: userEmail));
+          snackBarErrorMassage(context, message: 'Register Successfully');
+          isLoading = false;
+        } else if (state is RegisterFailureState) {
+          snackBarErrorMassage(context, message: state.errorMessage);
+          isLoading = false;
         }
       },
-      child: Text(
-        'Register',
-        style: Theme.of(context).textTheme.titleLarge,
-      ),
+      builder: (context, state) {
+        return ModalProgressHUD(
+          inAsyncCall: isLoading,
+          child: Scaffold(
+            backgroundColor: kPrimaryColor,
+            appBar: CustomAppBar(context),
+            body: Form(
+              key: formKey,
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Image.asset(
+                        'assets/images/chat_Image.png',
+                        height: MediaQuery.of(context).size.height * .40,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'Register '.toUpperCase(),
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      // Email Text Form Field
+                      CustomTextFormField(
+                        onChanged: (email) {
+                          userEmail = email;
+                        },
+                        label: 'Enter your Email',
+                        formKey: formKey,
+                        prefixIcon: Icons.email,
+                        keyboardType: TextInputType.emailAddress,
+                        stringValidate: 'Email was Missed',
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      //password Text Form Field
+                      CustomTextFormField(
+                        onChanged: (password) {
+                          userPassword = password;
+                        },
+                        label: 'Enter your password',
+                        formKey: formKey,
+                        prefixIcon: Icons.lock,
+                        passwordSecure: false,
+                        suffixIcon: Icons.visibility,
+                        keyboardType: TextInputType.text,
+                        stringValidate: ' Password was Missed ',
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      MaterialButton(
+                        minWidth: double.infinity,
+                        color: kButtonColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        onPressed: () async {
+                          if (formKey.currentState!.validate()) {
+                            await BlocProvider.of<RegisterCubit>(context)
+                                .userRegister(
+                              context,
+                              userEmail: userEmail!,
+                              userPassword: userPassword!,
+                            );
+                          }
+                        },
+                        child: Text(
+                          'Register',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                      //CustomRegisterMaterialButton(formKey: formKey, userEmail: userEmail , userPassword: userPassword,),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'already have an account?',
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                          CustomGestureDetector(
+                            text: '  Login',
+                            widget: LoginScreen(),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
-  }
-
-  Future<void> buildUserRegister() async {
-    await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: userEmail!, password: userPassword!);
-  }
-  void buildErrorRegister(FirebaseAuthException e, BuildContext context) {
-    if (e.code == 'weak-password') {
-      snackBarErrorMassage(context, message: 'The password provided is too weak');
-      print('The password provided is too weak.');
-    }
-    else if (e.code == 'email-already-in-use') {
-      snackBarErrorMassage(context, message: 'The account already exists for that email');
-      print('The account already exists for that email.');
-    }
-    else{
-      snackBarErrorMassage(context, message: 'happened error try again');
-      print('happened error try again.');
-    }
   }
 }

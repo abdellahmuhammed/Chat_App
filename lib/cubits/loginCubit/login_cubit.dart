@@ -19,7 +19,6 @@ class LoginCubit extends Cubit<LoginState> {
         password: userPassword,
       );
       debugPrint('create User Login Successfully');
-
       emit(LoginSuccessState());
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
