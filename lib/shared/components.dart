@@ -42,13 +42,8 @@ class CustomTextFormField extends StatelessWidget {
           icon: Icon(suffixIcon),
         ),
       ),
-      // onFieldSubmitted: (value) {
-      //   if (formKey.currentState!.validate()) {
-      //     navigateTo(context, widget);
-      //   }
-      // },
-      validator: (String? value) {
-        if (value == null || value == false || value.isEmpty) {
+      validator: (String? value ) {
+        if (value == null || value.isEmpty || value.trim().isEmpty) {
           return stringValidate;
         }
         return null;

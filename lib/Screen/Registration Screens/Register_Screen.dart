@@ -110,7 +110,8 @@ class RegisterScreen extends StatelessWidget {
                             );
                           }
                         },
-                        child: Text(
+                        child: state is RegisterIsLoadingState ?const Center(child:   SizedBox(height: 20,
+                            child: CircularProgressIndicator())): Text(
                           'Register',
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
