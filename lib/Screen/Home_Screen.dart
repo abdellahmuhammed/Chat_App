@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key, required this.userEmail});
-  final String userEmail;
+  final String? userEmail;
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -16,8 +16,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final CollectionReference messages =
       FirebaseFirestore.instance.collection(kMessageCollection);
 
-  final TextEditingController txetFormController = TextEditingController();
-  final lsitController = ScrollController();
+  final TextEditingController textFormController = TextEditingController();
+  final listController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +26,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Scaffold _buildHomeScreen() {
     return Scaffold(
-      appBar: CustomAppBar(context, tittle: 'Samona Chat', centerTittle: true),
+      appBar: CustomAppBar(context, tittle: 'Chat App', centerTittle: true),
       body: StreamBuilder(
         stream: messages.orderBy(kCreatedAt, descending: true).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return _buildDataLoading();
           } else if (snapshot.hasData) {
-            return _buildDataConected(snapshot, context);
+            return _buildDataConnected(snapshot, context);
           } else {
             return LoginScreen();
           }
@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  _buildDataConected(
+  _buildDataConnected(
       AsyncSnapshot<QuerySnapshot<Object?>> snapshot, BuildContext context) {
     List<MessageModel> messageList = [];
     for (int i = 0; i < snapshot.data!.docs.length; i++) {
@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Expanded(
           child: ListView.builder(
               reverse: true,
-              controller: lsitController,
+              controller: listController,
               itemCount: messageList.length,
               itemBuilder: (context, index) {
                 return messageList[index].id == widget.userEmail
@@ -75,11 +75,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         Padding(
           padding: const EdgeInsets.all(12.0),
-          child: CustomTextFild(
-              txetFormController: txetFormController,
+          child: CustomTextFiled(
+              textFormController: textFormController,
               messages: messages,
               widget: widget,
-              lsitController: lsitController),
+              listController: listController),
         ),
       ],
     );
@@ -92,24 +92,24 @@ Center _buildDataLoading() {
   );
 }
 
-class CustomTextFild extends StatelessWidget {
-  const CustomTextFild({
+class CustomTextFiled extends StatelessWidget {
+  const CustomTextFiled({
     super.key,
-    required this.txetFormController,
+    required this.textFormController,
     required this.messages,
     required this.widget,
-    required this.lsitController,
+    required this.listController,
   });
 
-  final TextEditingController txetFormController;
+  final TextEditingController textFormController;
   final CollectionReference<Object?> messages;
   final HomeScreen widget;
-  final ScrollController lsitController;
+  final ScrollController listController;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: txetFormController,
+      controller: textFormController,
       decoration: InputDecoration(
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5),
@@ -125,14 +125,14 @@ class CustomTextFild extends StatelessWidget {
         ),
         suffixIcon: IconButton(
           onPressed: () {
-            if (txetFormController.text.isNotEmpty) {
+            if (textFormController.text.isNotEmpty) {
               messages.add({
-                kMessage: txetFormController.text,
+                kMessage: textFormController.text,
                 kCreatedAt: DateTime.now(),
                 'id': widget.userEmail
               });
-              txetFormController.clear();
-              lsitController.animateTo(
+              textFormController.clear();
+              listController.animateTo(
                 0,
                 duration: Duration(seconds: 1),
                 curve: Curves.easeIn,
